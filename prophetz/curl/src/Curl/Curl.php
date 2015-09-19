@@ -1,6 +1,6 @@
 <?php
 
-namespace Prophetz\Curl;
+namespace Curl;
 
 
 class Curl
