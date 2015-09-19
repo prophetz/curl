@@ -1,4 +1,0 @@
-services:
-    prophetz.curl:
-        class: Prophetz\CurlBundle\Service\Curl
-        arguments: [@service_container]
