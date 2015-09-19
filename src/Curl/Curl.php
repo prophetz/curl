@@ -2,7 +2,6 @@
 
 namespace Curl;
 
-
 class Curl
 {
     /**
