@@ -1,6 +1,6 @@
 {
   "name": "prophetz/curl-bundle",
-  "description": "Symfony CurlBundle",
+  "description": "Symfony CURL Bundle",
   "version":"1.0.0",
   "authors": [
     {
@@ -11,5 +11,8 @@
   "minimum-stability": "stable",
   "require": {
     "php": ">=5.4"
+  },
+  "autoload": {
+    "psr-4": { "": "src/" }
   }
 }
