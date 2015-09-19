@@ -1,6 +1,6 @@
 {
-  "name": "prophetz/curl-bundle",
-  "description": "Symfony CURL Bundle",
+  "name": "prophetz/curl",
+  "description": "CURL library",
   "version":"1.0.1",
   "license": "MIT",
   "authors": [
@@ -15,5 +15,5 @@
   },
   "autoload": {
     "psr-4": {"Curl\\": "src/Curl"}
-  },
+  }
 }
