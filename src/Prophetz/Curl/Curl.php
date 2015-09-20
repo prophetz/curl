@@ -253,6 +253,13 @@ class Curl
      */
     public function getData()
     {
+        $result = json_decode($this->data);
+
+        if (json_last_error() === JSON_ERROR_NONE) {
+
+            return $result;
+        }
+
         return $this->data;
     }
 
