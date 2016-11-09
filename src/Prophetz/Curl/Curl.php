@@ -2,6 +2,12 @@
 
 namespace Prophetz\Curl;
 
+use Prophetz\Curl\Exception\CurlException;
+
+/**
+ * Class Curl
+ * @package Prophetz\Curl
+ */
 class Curl
 {
     /**
@@ -76,6 +82,13 @@ class Curl
      * @var int
      */
     private $connectionTimeout = 10;
+
+    /** @var string */
+    private $lastError;
+    /** @var string */
+    private $lastErrorNumber;
+    /** @var array */
+    private $lastInfo;
 
     /**
      * @return resource
@@ -423,14 +436,72 @@ class Curl
         return $this;
     }
 
+    /**
+     * @return string
+     */
+    public function getLastError()
+    {
+        return $this->lastError;
+    }
+
+    /**
+     * @param string $lastError
+     */
+    public function setLastError($lastError)
+    {
+        $this->lastError = $lastError;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLastErrorNumber()
+    {
+        return $this->lastErrorNumber;
+    }
+
+    /**
+     * @param string $lastErrorNumber
+     */
+    public function setLastErrorNumber($lastErrorNumber)
+    {
+        $this->lastErrorNumber = $lastErrorNumber;
+    }
+
+    /**
+     * @return array
+     */
+    public function getLastInfo()
+    {
+        return $this->lastInfo;
+    }
+
+    /**
+     * @param array $lastInfo
+     */
+    public function setLastInfo($lastInfo)
+    {
+        $this->lastInfo = $lastInfo;
+    }
+
+    /**
+     * @param null $url
+     * @return $this
+     * @throws \Exception
+     */
     public function init($url = null)
     {
         $instance = curl_init();
         if (false === $instance) {
-            throw new \Exception('Failed to initialize curl');
+            throw new CurlException('Failed to initialize curl');
         }
         $this->setUrl($url);
         $this->setInstance($instance);
+
+        $this->setLastError(null);
+        $this->setLastErrorNumber(null);
+        $this->setLastInfo(null);
+        $this->setData(null);
 
         return $this;
     }
@@ -439,14 +510,20 @@ class Curl
     {
         $ch = $this->getInstance();
         if (!$ch) {
-            throw new \Exception('Before exec need init');
+            throw new CurlException('Before exec need init');
         }
 
         $this->prepare();
 
-        $data = curl_exec($ch);
+        $data         = curl_exec($ch);
+        $errorNumber  = curl_errno($ch);
+        $errorMessage = curl_error($ch);
+        $info         = curl_getinfo($ch);
 
         $this->setData($data);
+        $this->setLastErrorNumber($errorNumber);
+        $this->setLastError($errorMessage);
+        $this->setLastInfo($info);
 
         $this->close();
 
@@ -466,7 +543,7 @@ class Curl
         }
 
         if (!$this->getUrl()) {
-            throw new \Exception('Url not settled');
+            throw new CurlException('Url not settled');
         } else {
             curl_setopt($ch, CURLOPT_URL, $this->getUrl());
         }
@@ -519,7 +596,7 @@ class Curl
     {
         $ch = $this->getInstance();
         if (!$ch) {
-            throw new \Exception('Before close need init');
+            throw new CurlException('Before close need init');
         }
         curl_close($ch);
 
