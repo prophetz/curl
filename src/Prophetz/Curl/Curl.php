@@ -84,11 +84,11 @@ class Curl
     private $connectionTimeout = 10;
 
     /** @var string */
-    private $lastError;
+    private $requestErrorMessage;
     /** @var string */
-    private $lastErrorNumber;
-    /** @var array */
-    private $lastInfo;
+    private $requestErrorNumber;
+    /** @var ResponseInfo */
+    private $requestInfo;
 
     /**
      * @return resource
@@ -439,49 +439,53 @@ class Curl
     /**
      * @return string
      */
-    public function getLastError()
+    public function getRequestErrorMessage()
     {
-        return $this->lastError;
+        return $this->requestErrorMessage;
     }
 
     /**
-     * @param string $lastError
+     * @param string $requestErrorMessage
      */
-    public function setLastError($lastError)
+    public function setRequestErrorMessage($requestErrorMessage)
     {
-        $this->lastError = $lastError;
+        $this->requestErrorMessage = $requestErrorMessage;
     }
 
     /**
      * @return string
      */
-    public function getLastErrorNumber()
+    public function getRequestErrorNumber()
     {
-        return $this->lastErrorNumber;
+        return $this->requestErrorNumber;
     }
 
     /**
-     * @param string $lastErrorNumber
+     * @param string $requestErrorNumber
+     * @return Curl
      */
-    public function setLastErrorNumber($lastErrorNumber)
+    public function setRequestErrorNumber($requestErrorNumber)
     {
-        $this->lastErrorNumber = $lastErrorNumber;
+        $this->requestErrorNumber = $requestErrorNumber;
+        return $this;
     }
 
     /**
-     * @return array
+     * @return ResponseInfo
      */
-    public function getLastInfo()
+    public function getRequestInfo()
     {
-        return $this->lastInfo;
+        return $this->requestInfo;
     }
 
     /**
-     * @param array $lastInfo
+     * @param ResponseInfo $requestInfo
+     * @return Curl
      */
-    public function setLastInfo($lastInfo)
+    public function setRequestInfo($requestInfo)
     {
-        $this->lastInfo = $lastInfo;
+        $this->requestInfo = $requestInfo;
+        return $this;
     }
 
     /**
@@ -498,11 +502,6 @@ class Curl
         $this->setUrl($url);
         $this->setInstance($instance);
 
-        $this->setLastError(null);
-        $this->setLastErrorNumber(null);
-        $this->setLastInfo(null);
-        $this->setData(null);
-
         return $this;
     }
 
@@ -515,15 +514,10 @@ class Curl
 
         $this->prepare();
 
-        $data         = curl_exec($ch);
-        $errorNumber  = curl_errno($ch);
-        $errorMessage = curl_error($ch);
-        $info         = curl_getinfo($ch);
-
-        $this->setData($data);
-        $this->setLastErrorNumber($errorNumber);
-        $this->setLastError($errorMessage);
-        $this->setLastInfo($info);
+        $this->setData(curl_exec($ch));
+        $this->setRequestErrorNumber(curl_errno($ch));
+        $this->setRequestErrorMessage(curl_error($ch));
+        $this->setRequestInfo(new ResponseInfo(curl_getinfo($ch)));
 
         $this->close();
 
